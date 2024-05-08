@@ -9,5 +9,4 @@ public record EpisodeData(
         @JsonAlias("Episode") int episodeNumber,
         @JsonAlias("imdbRating") String rating,
         @JsonAlias("Released") String releaseDate) {
-
 }
