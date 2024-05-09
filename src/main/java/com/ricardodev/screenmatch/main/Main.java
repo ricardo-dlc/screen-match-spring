@@ -3,9 +3,12 @@ package com.ricardodev.screenmatch.main;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
+import com.ricardodev.screenmatch.model.EpisodeData;
 import com.ricardodev.screenmatch.model.SeasonData;
 import com.ricardodev.screenmatch.model.SeriesData;
 import com.ricardodev.screenmatch.service.ApiConsuming;
@@ -31,6 +34,7 @@ public class Main {
             String json;
             json = apiConsuming.getData(apiEndpoint);
             SeriesData seriesData = converter.getData(json, SeriesData.class);
+            System.out.println(seriesData);
 
             List<SeasonData> seasons = new ArrayList<>();
             for (int i = 1; i <= seriesData.totalSeasons(); i++) {
@@ -39,7 +43,23 @@ public class Main {
                 seasons.add(seasonData);
             }
 
-            seasons.forEach(System.out::println);
+            // seasons.forEach(System.out::println);
+
+            // seasons.forEach(seasonData -> {
+            // seasonData.episodes().forEach(episode ->
+            // System.out.println(episode.title()));
+            // });
+
+            List<EpisodeData> episodesData = seasons.stream()
+                    .flatMap(t -> t.episodes().stream())
+                    .collect(Collectors.toList());
+
+            System.out.println("Top 5 episodes");
+            episodesData.stream()
+                    .filter(e -> !e.rating().equalsIgnoreCase("N/A"))
+                    .sorted(Comparator.comparing(EpisodeData::rating).reversed())
+                    .limit(5)
+                    .forEach(System.out::println);
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
