@@ -2,6 +2,8 @@ package com.ricardodev.screenmatch.main;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -67,10 +69,22 @@ public class Main {
                     .flatMap(s -> s.episodes().stream()
                             .map(e -> new Episode(s.seasonNumber(), e)))
                     .collect(Collectors.toList());
-
             episodes.forEach(System.out::println);
+
+            // Search by releaseDate
+            System.out.print("Enter the year from which you want to see the episodes: ");
+            int year = scanner.nextInt();
+            scanner.nextLine();
+
+            LocalDate searchDate = LocalDate.of(year, 1, 1);
+
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            episodes.stream()
+                    .filter(e -> e.getReleaseDate() != null && e.getReleaseDate().isAfter(searchDate))
+                    .forEach(e -> System.out.println("Season %s, Episode %s, Release Year %s"
+                            .formatted(e.getSeasonNumber(), e.getTitle(), e.getReleaseDate().format(dtf))));
         } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
         }
 
