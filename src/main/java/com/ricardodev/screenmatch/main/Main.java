@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import com.ricardodev.screenmatch.model.Episode;
 import com.ricardodev.screenmatch.model.EpisodeData;
 import com.ricardodev.screenmatch.model.SeasonData;
 import com.ricardodev.screenmatch.model.SeriesData;
@@ -54,12 +55,20 @@ public class Main {
                     .flatMap(t -> t.episodes().stream())
                     .collect(Collectors.toList());
 
+            // Filter top 5 rated episodes
             System.out.println("Top 5 episodes");
             episodesData.stream()
                     .filter(e -> !e.rating().equalsIgnoreCase("N/A"))
                     .sorted(Comparator.comparing(EpisodeData::rating).reversed())
                     .limit(5)
                     .forEach(System.out::println);
+
+            List<Episode> episodes = seasons.stream()
+                    .flatMap(s -> s.episodes().stream()
+                            .map(e -> new Episode(s.seasonNumber(), e)))
+                    .collect(Collectors.toList());
+
+            episodes.forEach(System.out::println);
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
