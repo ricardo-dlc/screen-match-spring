@@ -6,7 +6,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -58,12 +61,16 @@ public class Main {
                     .collect(Collectors.toList());
 
             // Filter top 5 rated episodes
-            System.out.println("Top 5 episodes");
-            episodesData.stream()
-                    .filter(e -> !e.rating().equalsIgnoreCase("N/A"))
-                    .sorted(Comparator.comparing(EpisodeData::rating).reversed())
-                    .limit(5)
-                    .forEach(System.out::println);
+            // System.out.println("Top 5 episodes");
+            // episodesData.stream()
+            // .filter(e -> !e.rating().equalsIgnoreCase("N/A"))
+            // .peek(e -> System.out.println("Primer filtro N/A" + e))
+            // .sorted(Comparator.comparing(EpisodeData::rating).reversed())
+            // .peek(e -> System.out.println("Segundo filtro (M>m)" + e))
+            // .map(e -> e.title().toUpperCase())
+            // .peek(e -> System.out.println("Tercer filtro" + e))
+            // .limit(5)
+            // .forEach(System.out::println);
 
             List<Episode> episodes = seasons.stream()
                     .flatMap(s -> s.episodes().stream()
@@ -71,18 +78,46 @@ public class Main {
                     .collect(Collectors.toList());
             episodes.forEach(System.out::println);
 
-            // Search by releaseDate
-            System.out.print("Enter the year from which you want to see the episodes: ");
-            int year = scanner.nextInt();
-            scanner.nextLine();
+            // // Search by releaseDate
+            // System.out.print("Enter the year from which you want to see the episodes: ");
+            // int year = scanner.nextInt();
+            // scanner.nextLine();
 
-            LocalDate searchDate = LocalDate.of(year, 1, 1);
+            // LocalDate searchDate = LocalDate.of(year, 1, 1);
 
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            episodes.stream()
-                    .filter(e -> e.getReleaseDate() != null && e.getReleaseDate().isAfter(searchDate))
-                    .forEach(e -> System.out.println("Season %s, Episode %s, Release Year %s"
-                            .formatted(e.getSeasonNumber(), e.getTitle(), e.getReleaseDate().format(dtf))));
+            // DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            // episodes.stream()
+            // .filter(e -> e.getReleaseDate() != null &&
+            // e.getReleaseDate().isAfter(searchDate))
+            // .forEach(e -> System.out.println("Season %s, Episode %s, Release Year %s"
+            // .formatted(e.getSeasonNumber(), e.getTitle(),
+            // e.getReleaseDate().format(dtf))));
+
+            // Search episode by title
+            // System.out.println("Enter a title:");
+            // String title = scanner.nextLine();
+            // Optional<Episode> result = episodes.stream()
+            // .filter(e -> e.getTitle().toUpperCase().contains(title.toUpperCase()))
+            // .findFirst();
+            // if (result.isPresent()) {
+            // System.out.println("Episode found!");
+            // System.out.println("The data is: " + result.get());
+            // } else {
+            // System.out.println("Episode not foud");
+            // }
+
+            Map<Integer, Double> ratingBySeason = episodes.stream()
+                    .filter(e -> e.getRating() > 0.0)
+                    .collect(Collectors.groupingBy(Episode::getSeasonNumber,
+                            Collectors.averagingDouble(Episode::getRating)));
+            System.out.println(ratingBySeason);
+
+            DoubleSummaryStatistics stc = episodes.stream()
+                    .filter(e -> e.getRating() > 0.0)
+                    .collect(Collectors.summarizingDouble(Episode::getRating));
+            System.out.println("Average " + stc.getAverage());
+            System.out.println("Best rating " + stc.getMax());
+            System.out.println("Worst rating " + stc.getMin());
         } catch (UnsupportedEncodingException e) {
 
             e.printStackTrace();
