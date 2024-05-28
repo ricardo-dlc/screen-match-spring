@@ -20,6 +20,7 @@ public class Main {
     private final String API_KEY = env.get("API_KEY");
     private final String BASE_URL = "http://www.omdbapi.com/?apikey=%s".formatted(this.API_KEY);
     private DataConverter converter = new DataConverter();
+    private List<SeriesData> seriesHistory = new ArrayList<>();
 
     public void showMenu() throws UnsupportedEncodingException {
         int option = -1;
@@ -27,6 +28,7 @@ public class Main {
             String menu = """
                     1. Search series
                     2. Search episodes
+                    3. Show search history
 
                     0. Exit
                     """;
@@ -42,6 +44,9 @@ public class Main {
                 case 2:
                     searchEpisodeInSeries();
                     break;
+                case 3:
+                    showSearchHistory();
+                    break;
                 case 0:
                     System.out.println("Exiting...");
                     break;
@@ -52,11 +57,7 @@ public class Main {
         }
     }
 
-    private void searchSeriesWeb() {
-
-    }
-
-    private SeriesData searchSeries() throws UnsupportedEncodingException {
+    private SeriesData getSeriesData() throws UnsupportedEncodingException {
         System.out.print("Enter the series name you want to seach: ");
         String seriesName = scanner.nextLine();
         String apiEndpoint = BASE_URL + "&t=" + URLEncoder.encode(seriesName, "UTF-8");
@@ -65,7 +66,7 @@ public class Main {
     }
 
     private void searchEpisodeInSeries() throws UnsupportedEncodingException {
-        SeriesData seriesData = searchSeries();
+        SeriesData seriesData = getSeriesData();
         List<SeasonData> seasons = new ArrayList<>();
         for (int i = 1; i <= seriesData.totalSeasons(); i++) {
             String apiEndpoint = BASE_URL + "&t=" + URLEncoder.encode(seriesData.title(), "UTF-8");
@@ -74,5 +75,15 @@ public class Main {
             seasons.add(seasonData);
         }
         seasons.forEach(System.out::println);
+    }
+
+    private void searchSeriesWeb() throws UnsupportedEncodingException {
+        SeriesData data = getSeriesData();
+        seriesHistory.add(data);
+        System.out.println(data);
+    }
+
+    private void showSearchHistory() {
+        seriesHistory.forEach(System.out::println);
     }
 }
