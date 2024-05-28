@@ -2,19 +2,10 @@ package com.ricardodev.screenmatch.main;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.DoubleSummaryStatistics;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
-import com.ricardodev.screenmatch.model.Episode;
-import com.ricardodev.screenmatch.model.EpisodeData;
 import com.ricardodev.screenmatch.model.SeasonData;
 import com.ricardodev.screenmatch.model.SeriesData;
 import com.ricardodev.screenmatch.service.ApiConsuming;
@@ -30,98 +21,58 @@ public class Main {
     private final String BASE_URL = "http://www.omdbapi.com/?apikey=%s".formatted(this.API_KEY);
     private DataConverter converter = new DataConverter();
 
-    public void showMenu() {
-        try {
-            System.out.print("Enter the series name you want to seach: ");
-            String input = scanner.nextLine();
-            String seriesName = URLEncoder.encode(input, "UTF-8");
-            String apiEndpoint = BASE_URL + "&t=%s".formatted(seriesName);
+    public void showMenu() throws UnsupportedEncodingException {
+        int option = -1;
+        while (option != 0) {
+            String menu = """
+                    1. Search series
+                    2. Search episodes
 
-            String json;
-            json = apiConsuming.getData(apiEndpoint);
-            SeriesData seriesData = converter.getData(json, SeriesData.class);
-            System.out.println(seriesData);
+                    0. Exit
+                    """;
+            System.out.println(menu);
+            System.out.print("Your option: ");
+            option = scanner.nextInt();
+            scanner.nextLine();
 
-            List<SeasonData> seasons = new ArrayList<>();
-            for (int i = 1; i <= seriesData.totalSeasons(); i++) {
-                json = this.apiConsuming.getData(apiEndpoint + "&season=" + i);
-                SeasonData seasonData = this.converter.getData(json, SeasonData.class);
-                seasons.add(seasonData);
+            switch (option) {
+                case 1:
+                    searchSeriesWeb();
+                    break;
+                case 2:
+                    searchEpisodeInSeries();
+                    break;
+                case 0:
+                    System.out.println("Exiting...");
+                    break;
+                default:
+                    System.out.println("Invalid option.");
+                    break;
             }
-
-            // seasons.forEach(System.out::println);
-
-            // seasons.forEach(seasonData -> {
-            // seasonData.episodes().forEach(episode ->
-            // System.out.println(episode.title()));
-            // });
-
-            List<EpisodeData> episodesData = seasons.stream()
-                    .flatMap(t -> t.episodes().stream())
-                    .collect(Collectors.toList());
-
-            // Filter top 5 rated episodes
-            // System.out.println("Top 5 episodes");
-            // episodesData.stream()
-            // .filter(e -> !e.rating().equalsIgnoreCase("N/A"))
-            // .peek(e -> System.out.println("Primer filtro N/A" + e))
-            // .sorted(Comparator.comparing(EpisodeData::rating).reversed())
-            // .peek(e -> System.out.println("Segundo filtro (M>m)" + e))
-            // .map(e -> e.title().toUpperCase())
-            // .peek(e -> System.out.println("Tercer filtro" + e))
-            // .limit(5)
-            // .forEach(System.out::println);
-
-            List<Episode> episodes = seasons.stream()
-                    .flatMap(s -> s.episodes().stream()
-                            .map(e -> new Episode(s.seasonNumber(), e)))
-                    .collect(Collectors.toList());
-            episodes.forEach(System.out::println);
-
-            // // Search by releaseDate
-            // System.out.print("Enter the year from which you want to see the episodes: ");
-            // int year = scanner.nextInt();
-            // scanner.nextLine();
-
-            // LocalDate searchDate = LocalDate.of(year, 1, 1);
-
-            // DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            // episodes.stream()
-            // .filter(e -> e.getReleaseDate() != null &&
-            // e.getReleaseDate().isAfter(searchDate))
-            // .forEach(e -> System.out.println("Season %s, Episode %s, Release Year %s"
-            // .formatted(e.getSeasonNumber(), e.getTitle(),
-            // e.getReleaseDate().format(dtf))));
-
-            // Search episode by title
-            // System.out.println("Enter a title:");
-            // String title = scanner.nextLine();
-            // Optional<Episode> result = episodes.stream()
-            // .filter(e -> e.getTitle().toUpperCase().contains(title.toUpperCase()))
-            // .findFirst();
-            // if (result.isPresent()) {
-            // System.out.println("Episode found!");
-            // System.out.println("The data is: " + result.get());
-            // } else {
-            // System.out.println("Episode not foud");
-            // }
-
-            Map<Integer, Double> ratingBySeason = episodes.stream()
-                    .filter(e -> e.getRating() > 0.0)
-                    .collect(Collectors.groupingBy(Episode::getSeasonNumber,
-                            Collectors.averagingDouble(Episode::getRating)));
-            System.out.println(ratingBySeason);
-
-            DoubleSummaryStatistics stc = episodes.stream()
-                    .filter(e -> e.getRating() > 0.0)
-                    .collect(Collectors.summarizingDouble(Episode::getRating));
-            System.out.println("Average " + stc.getAverage());
-            System.out.println("Best rating " + stc.getMax());
-            System.out.println("Worst rating " + stc.getMin());
-        } catch (UnsupportedEncodingException e) {
-
-            e.printStackTrace();
         }
+    }
 
+    private void searchSeriesWeb() {
+
+    }
+
+    private SeriesData searchSeries() throws UnsupportedEncodingException {
+        System.out.print("Enter the series name you want to seach: ");
+        String seriesName = scanner.nextLine();
+        String apiEndpoint = BASE_URL + "&t=" + URLEncoder.encode(seriesName, "UTF-8");
+        String json = apiConsuming.getData(apiEndpoint);
+        return converter.getData(json, SeriesData.class);
+    }
+
+    private void searchEpisodeInSeries() throws UnsupportedEncodingException {
+        SeriesData seriesData = searchSeries();
+        List<SeasonData> seasons = new ArrayList<>();
+        for (int i = 1; i <= seriesData.totalSeasons(); i++) {
+            String apiEndpoint = BASE_URL + "&t=" + URLEncoder.encode(seriesData.title(), "UTF-8");
+            String json = apiConsuming.getData(apiEndpoint + "&season=" + i);
+            SeasonData seasonData = converter.getData(json, SeasonData.class);
+            seasons.add(seasonData);
+        }
+        seasons.forEach(System.out::println);
     }
 }
