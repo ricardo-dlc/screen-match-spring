@@ -3,10 +3,13 @@ package com.ricardodev.screenmatch.main;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import com.ricardodev.screenmatch.model.SeasonData;
+import com.ricardodev.screenmatch.model.Series;
 import com.ricardodev.screenmatch.model.SeriesData;
 import com.ricardodev.screenmatch.service.ApiConsuming;
 import com.ricardodev.screenmatch.service.DataConverter;
@@ -84,6 +87,14 @@ public class Main {
     }
 
     private void showSearchHistory() {
-        seriesHistory.forEach(System.out::println);
+        List<Series> seriesList = new ArrayList<>();
+        seriesList = seriesHistory.stream()
+                .map(s -> new Series(s))
+                .collect(Collectors.toList());
+
+        seriesList.stream()
+                .sorted(Comparator.comparing(Series::getGenre))
+                .forEach(System.out::println);
+        ;
     }
 }
