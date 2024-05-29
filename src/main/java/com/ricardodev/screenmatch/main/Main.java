@@ -20,7 +20,7 @@ public class Main {
     private Scanner scanner = new Scanner(System.in);
     private ApiConsuming apiConsuming = new ApiConsuming();
     private final Dotenv env = Dotenv.load();
-    private final String API_KEY = env.get("API_KEY");
+    private final String API_KEY = env.get("OMDB_API_KEY");
     private final String BASE_URL = "http://www.omdbapi.com/?apikey=%s".formatted(this.API_KEY);
     private DataConverter converter = new DataConverter();
     private List<SeriesData> seriesHistory = new ArrayList<>();
