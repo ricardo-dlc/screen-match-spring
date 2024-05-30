@@ -95,10 +95,7 @@ public class Main {
     }
 
     private void showSearchHistory() {
-        List<Series> seriesList = new ArrayList<>();
-        seriesList = seriesHistory.stream()
-                .map(s -> new Series(s))
-                .collect(Collectors.toList());
+        List<Series> seriesList = seriesRepository.findAll();
 
         seriesList.stream()
                 .sorted(Comparator.comparing(Series::getGenre))

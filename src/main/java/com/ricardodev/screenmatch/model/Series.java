@@ -30,6 +30,9 @@ public class Series {
     @Transient
     private List<Episode> episodes;
 
+    public Series() {
+    }
+
     public Series(SeriesData seriesData) {
         this.title = seriesData.title();
         this.totalSeasons = seriesData.totalSeasons();
