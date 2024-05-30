@@ -1,4 +1,4 @@
-datasource-config.properties
+secrets-config.properties
 .env
 HELP.md
 target/

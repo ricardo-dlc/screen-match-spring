@@ -2,7 +2,7 @@ spring:
   application:
     name: screenmatch
   config:
-    import: optional:datasource-config.properties
+    import: optional:secrets-config.properties
   jpa:
     show-sql: true
     format-sql: true
