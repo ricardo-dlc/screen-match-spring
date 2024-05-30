@@ -16,21 +16,21 @@ import com.ricardodev.screenmatch.model.SeriesData;
 import com.ricardodev.screenmatch.repository.SeriesRepository;
 import com.ricardodev.screenmatch.service.ApiConsuming;
 import com.ricardodev.screenmatch.service.DataConverter;
-
-import io.github.cdimascio.dotenv.Dotenv;
+import com.ricardodev.screenmatch.service.SecretsService;
 
 public class Main {
+    private final SecretsService secretsService;
+    private final String BASE_URL;
     private Scanner scanner = new Scanner(System.in);
     private ApiConsuming apiConsuming = new ApiConsuming();
-    private final Dotenv env = Dotenv.load();
-    private final String API_KEY = env.get("OMDB_API_KEY");
-    private final String BASE_URL = "http://www.omdbapi.com/?apikey=%s".formatted(this.API_KEY);
     private DataConverter converter = new DataConverter();
     private List<Series> seriesList;
     private SeriesRepository seriesRepository;
 
-    public Main(SeriesRepository seriesRepository) {
+    public Main(SeriesRepository seriesRepository, SecretsService secretsService) {
         this.seriesRepository = seriesRepository;
+        this.secretsService = secretsService;
+        this.BASE_URL = "http://www.omdbapi.com/?apikey=" + this.secretsService.getOmdbApiKey();
     }
 
     public void showMenu() throws UnsupportedEncodingException {

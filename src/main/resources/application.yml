@@ -15,4 +15,4 @@ spring:
     driver-class-name: org.postgresql.Driver
 hibernate:
   dialect: org.hibernate.dialect.HSQLDialect
-
+omdb-api-key: ${OMDB_API_KEY}
