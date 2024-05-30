@@ -41,6 +41,7 @@ public class Main {
                     2. Search episodes
                     3. Show search history
                     4. Find series by title
+                    5. Display top 5 series
 
                     0. Exit
                     """;
@@ -67,6 +68,9 @@ public class Main {
                     break;
                 case 4:
                     findSeriesByTitle();
+                    break;
+                case 5:
+                    findTop5Series();
                     break;
                 case 0:
                     System.out.println("Exiting...");
@@ -146,5 +150,11 @@ public class Main {
         } else {
             System.out.println("Series not found.");
         }
+    }
+
+    private void findTop5Series() {
+        List<Series> topSeries = seriesRepository.findTop5ByOrderByRatingDesc();
+        System.out.println("Top 5 series are:");
+        topSeries.forEach(s -> System.out.printf("%-20s %.1f%n", s.getTitle(), s.getRating()));
     }
 }
