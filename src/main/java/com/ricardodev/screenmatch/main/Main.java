@@ -5,9 +5,11 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import com.ricardodev.screenmatch.model.Episode;
 import com.ricardodev.screenmatch.model.SeasonData;
 import com.ricardodev.screenmatch.model.Series;
 import com.ricardodev.screenmatch.model.SeriesData;
@@ -24,7 +26,7 @@ public class Main {
     private final String API_KEY = env.get("OMDB_API_KEY");
     private final String BASE_URL = "http://www.omdbapi.com/?apikey=%s".formatted(this.API_KEY);
     private DataConverter converter = new DataConverter();
-    private List<SeriesData> seriesHistory = new ArrayList<>();
+    private List<Series> seriesList;
     private SeriesRepository seriesRepository;
 
     public Main(SeriesRepository seriesRepository) {
@@ -75,15 +77,35 @@ public class Main {
     }
 
     private void searchEpisodeInSeries() throws UnsupportedEncodingException {
-        SeriesData seriesData = getSeriesData();
-        List<SeasonData> seasons = new ArrayList<>();
-        for (int i = 1; i <= seriesData.totalSeasons(); i++) {
-            String apiEndpoint = BASE_URL + "&t=" + URLEncoder.encode(seriesData.title(), "UTF-8");
-            String json = apiConsuming.getData(apiEndpoint + "&season=" + i);
-            SeasonData seasonData = converter.getData(json, SeasonData.class);
-            seasons.add(seasonData);
+        showSearchHistory();
+        System.out.println("Type the name of the series for which you want to search for episodes: ");
+        String seriesName = scanner.nextLine();
+
+        Optional<Series> series = seriesList.stream()
+                .filter(s -> s.getTitle().toLowerCase().contains(seriesName.toLowerCase()))
+                .findFirst();
+
+        if (series.isPresent()) {
+            Series resultSeries = series.get();
+
+            List<SeasonData> seasons = new ArrayList<>();
+            String apiEndpoint = BASE_URL + "&t=" + URLEncoder.encode(resultSeries.getTitle(), "UTF-8");
+            for (int i = 1; i <= resultSeries.getTotalSeasons(); i++) {
+                String json = apiConsuming.getData(apiEndpoint + "&season=" + i);
+                SeasonData seasonData = converter.getData(json, SeasonData.class);
+                seasons.add(seasonData);
+            }
+            seasons.forEach(System.out::println);
+
+            List<Episode> episodes = seasons.stream()
+                    .flatMap(s -> s.episodes().stream()
+                            .map(e -> new Episode(s.seasonNumber(), e)))
+                    .collect(Collectors.toList());
+
+            resultSeries.setEpisodes(episodes);
+            seriesRepository.save(resultSeries);
         }
-        seasons.forEach(System.out::println);
+
     }
 
     private void searchSeriesWeb() throws UnsupportedEncodingException {
@@ -95,7 +117,7 @@ public class Main {
     }
 
     private void showSearchHistory() {
-        List<Series> seriesList = seriesRepository.findAll();
+        seriesList = seriesRepository.findAll();
 
         seriesList.stream()
                 .sorted(Comparator.comparing(Series::getGenre))

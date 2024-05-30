@@ -3,13 +3,17 @@ package com.ricardodev.screenmatch.model;
 import java.util.List;
 import java.util.OptionalDouble;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 
 @Entity
@@ -27,7 +31,7 @@ public class Series {
     private String actors;
     private String plot;
     private String poster;
-    @Transient
+    @OneToMany(mappedBy = "series", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Episode> episodes;
 
     public Series() {
@@ -109,9 +113,18 @@ public class Series {
         this.poster = poster;
     }
 
+    public List<Episode> getEpisodes() {
+        return episodes;
+    }
+
+    public void setEpisodes(List<Episode> episodes) {
+        episodes.forEach(e -> e.setSeries(this));
+        this.episodes = episodes;
+    }
+
     @Override
     public String toString() {
         return "genre=" + genre + ", title=" + title + ", totalSeasons=" + totalSeasons + ", rating=" + rating
-                + ", actors=" + actors + ", plot=" + plot + ", poster=" + poster;
+                + ", actors=" + actors + ", plot=" + plot + ", poster=" + poster + ", episodes=" + episodes;
     }
 }

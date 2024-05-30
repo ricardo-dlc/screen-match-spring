@@ -3,12 +3,29 @@ package com.ricardodev.screenmatch.model;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "episodes")
 public class Episode {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private int seasonNumber;
     private String title;
     private int episodeNumber;
     private Double rating;
     private LocalDate releaseDate;
+    @ManyToOne
+    private Series series;
+
+    public Episode() {
+    }
 
     public Episode(int seasonNumber, EpisodeData e) {
         this.seasonNumber = seasonNumber;
@@ -67,10 +84,17 @@ public class Episode {
         this.releaseDate = releaseDate;
     }
 
+    public Series getSeries() {
+        return series;
+    }
+
+    public void setSeries(Series serie) {
+        this.series = serie;
+    }
+
     @Override
     public String toString() {
         return "seasonNumber=" + seasonNumber + ", title=" + title + ", episodeNumber=" + episodeNumber
                 + ", rating=" + rating + ", releaseDate=" + releaseDate;
     }
-
 }

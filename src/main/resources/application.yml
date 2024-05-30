@@ -4,6 +4,8 @@ spring:
   config:
     import: optional:datasource-config.properties
   jpa:
+    show-sql: true
+    format-sql: true
     hibernate:
       ddl-auto: update
   datasource:
