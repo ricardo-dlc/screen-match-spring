@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.ricardodev.screenmatch.model.Episode;
 import com.ricardodev.screenmatch.model.Genre;
 import com.ricardodev.screenmatch.model.Series;
 
@@ -20,4 +21,7 @@ public interface SeriesRepository extends JpaRepository<Series, Long> {
 
     @Query("SELECT s FROM Series s WHERE s.totalSeasons <= :seasons AND s.rating >= :rating")
     List<Series> findBySeasonsAndRating(Integer seasons, Double rating);
+
+    @Query("SELECT e FROM Series s JOIN s.episodes e WHERE e.title ILIKE %:episodeName%")
+    List<Episode> findEpisodeByName(String episodeName);
 }

@@ -45,6 +45,7 @@ public class Main {
                     5. Display top 5 series
                     6. Find series by genre
                     7. Filter series by total seasons and rating
+                    8. Find episodes by name
 
                     0. Exit
                     """;
@@ -80,6 +81,9 @@ public class Main {
                     break;
                 case 7:
                     findByTotalSeasonsAndRating();
+                    break;
+                case 8:
+                    findEpisodeByName();
                     break;
                 case 0:
                     System.out.println("Exiting...");
@@ -200,6 +204,21 @@ public class Main {
             System.out.printf("Series with max %d seasons and a min rating of %.2f are:%n", totalSeasons, rating);
             seriesByGenre.forEach(
                     s -> System.out.printf("%-20s %-5d %.1f%n", s.getTitle(), s.getTotalSeasons(), s.getRating()));
+        } else {
+            System.out.println("No series found.");
+        }
+    }
+
+    private void findEpisodeByName() {
+        System.out.print("Type the name of the episode you want to search: ");
+        String episodeName = scanner.nextLine();
+
+        List<Episode> episodes = seriesRepository.findEpisodeByName(episodeName);
+        if (episodes.size() > 0) {
+            System.out.println("Episodes:");
+            episodes.forEach(
+                    e -> System.out.printf("Series: %-5s Season: %-5s Episode: %-30s Rating: %.1f%n",
+                            e.getSeries().getTitle(), e.getSeasonNumber(), e.getTitle(), e.getRating()));
         } else {
             System.out.println("No series found.");
         }
