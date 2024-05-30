@@ -40,13 +40,20 @@ public class Main {
                     1. Search series
                     2. Search episodes
                     3. Show search history
+                    4. Find series by title
 
                     0. Exit
                     """;
             System.out.println(menu);
-            System.out.print("Your option: ");
-            option = scanner.nextInt();
-            scanner.nextLine();
+            try {
+                System.out.print("Your option: ");
+                option = scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Invalid option!");
+                continue;
+            } finally {
+                scanner.nextLine();
+            }
 
             switch (option) {
                 case 1:
@@ -58,11 +65,14 @@ public class Main {
                 case 3:
                     showSearchHistory();
                     break;
+                case 4:
+                    findSeriesByTitle();
+                    break;
                 case 0:
                     System.out.println("Exiting...");
                     break;
                 default:
-                    System.out.println("Invalid option.");
+                    System.out.println("Unknown option.");
                     break;
             }
         }
@@ -123,5 +133,18 @@ public class Main {
                 .sorted(Comparator.comparing(Series::getGenre))
                 .forEach(System.out::println);
         ;
+    }
+
+    private void findSeriesByTitle() {
+        System.out.print("Type the name of the series which you want to search: ");
+        String seriesName = scanner.nextLine();
+
+        Optional<Series> result = seriesRepository.findByTitleContainsIgnoreCase(seriesName);
+
+        if (result.isPresent()) {
+            System.out.println("The series is: " + result.get());
+        } else {
+            System.out.println("Series not found.");
+        }
     }
 }
