@@ -44,6 +44,7 @@ public class Main {
                     4. Find series by title
                     5. Display top 5 series
                     6. Find series by genre
+                    7. Filter series by total seasons and rating
 
                     0. Exit
                     """;
@@ -76,6 +77,9 @@ public class Main {
                     break;
                 case 6:
                     findSeriesByGenre();
+                    break;
+                case 7:
+                    findByTotalSeasonsAndRating();
                     break;
                 case 0:
                     System.out.println("Exiting...");
@@ -178,6 +182,27 @@ public class Main {
 
         } catch (Exception e) {
             System.out.println("An error ocurred. Please try again.");
+        }
+    }
+
+    private void findByTotalSeasonsAndRating() {
+        System.out.println("Provide the following data (both inclusive)");
+        System.out.print("Enter the max seasons: ");
+        Integer totalSeasons = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.print("Enter the minimum rating: ");
+        Double rating = scanner.nextDouble();
+        scanner.nextLine();
+
+        List<Series> seriesByGenre = seriesRepository
+                .findByTotalSeasonsLessThanEqualAndRatingGreaterThanEqual(totalSeasons, rating);
+        if (seriesByGenre.size() > 0) {
+            System.out.printf("Series with max %d seasons and a min rating of %.2f are:%n", totalSeasons, rating);
+            seriesByGenre.forEach(
+                    s -> System.out.printf("%-20s %-5d %.1f%n", s.getTitle(), s.getTotalSeasons(), s.getRating()));
+        } else {
+            System.out.println("No series found.");
         }
     }
 }

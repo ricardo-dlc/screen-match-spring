@@ -10,6 +10,10 @@ import com.ricardodev.screenmatch.model.Series;
 
 public interface SeriesRepository extends JpaRepository<Series, Long> {
     Optional<Series> findByTitleContainsIgnoreCase(String seriesName);
+
     List<Series> findTop5ByOrderByRatingDesc();
+
     List<Series> findByGenre(Genre genre);
+
+    List<Series> findByTotalSeasonsLessThanEqualAndRatingGreaterThanEqual(Integer seasons, Double rating);
 }
