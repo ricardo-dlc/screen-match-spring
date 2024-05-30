@@ -10,6 +10,7 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import com.ricardodev.screenmatch.model.Episode;
+import com.ricardodev.screenmatch.model.Genre;
 import com.ricardodev.screenmatch.model.SeasonData;
 import com.ricardodev.screenmatch.model.Series;
 import com.ricardodev.screenmatch.model.SeriesData;
@@ -42,6 +43,7 @@ public class Main {
                     3. Show search history
                     4. Find series by title
                     5. Display top 5 series
+                    6. Find series by genre
 
                     0. Exit
                     """;
@@ -71,6 +73,9 @@ public class Main {
                     break;
                 case 5:
                     findTop5Series();
+                    break;
+                case 6:
+                    findSeriesByGenre();
                     break;
                 case 0:
                     System.out.println("Exiting...");
@@ -156,5 +161,23 @@ public class Main {
         List<Series> topSeries = seriesRepository.findTop5ByOrderByRatingDesc();
         System.out.println("Top 5 series are:");
         topSeries.forEach(s -> System.out.printf("%-20s %.1f%n", s.getTitle(), s.getRating()));
+    }
+
+    private void findSeriesByGenre() {
+        System.out.print("Type the genre/category name which you want to search: ");
+        String genre = scanner.nextLine();
+
+        try {
+            List<Series> seriesByGenre = seriesRepository.findByGenre(Genre.fromString(genre));
+            if (seriesByGenre.size() > 0) {
+                System.out.println("Series of genere " + genre + " are:");
+                seriesByGenre.forEach(s -> System.out.printf("%-20s %.1f%n", s.getTitle(), s.getRating()));
+            } else {
+                System.out.println("No series found.");
+            }
+
+        } catch (Exception e) {
+            System.out.println("An error ocurred. Please try again.");
+        }
     }
 }
