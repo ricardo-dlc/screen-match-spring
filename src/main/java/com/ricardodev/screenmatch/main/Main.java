@@ -195,8 +195,7 @@ public class Main {
         Double rating = scanner.nextDouble();
         scanner.nextLine();
 
-        List<Series> seriesByGenre = seriesRepository
-                .findByTotalSeasonsLessThanEqualAndRatingGreaterThanEqual(totalSeasons, rating);
+        List<Series> seriesByGenre = seriesRepository.findBySeasonsAndRating(totalSeasons, rating);
         if (seriesByGenre.size() > 0) {
             System.out.printf("Series with max %d seasons and a min rating of %.2f are:%n", totalSeasons, rating);
             seriesByGenre.forEach(
