@@ -3,6 +3,9 @@ spring:
     name: screenmatch
   config:
     import: optional:datasource-config.properties
+  jpa:
+    hibernate:
+      ddl-auto: update
   datasource:
     url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
     username: ${DATABASE_USERNAME}

@@ -1,18 +1,34 @@
 package com.ricardodev.screenmatch.model;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.OptionalDouble;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
+@Entity
 public class Series {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(unique = true)
     private String title;
     private int totalSeasons;
     private Double rating;
     // private List<Genre> genres;
+    @Enumerated(EnumType.STRING)
     private Genre genre;
     private String actors;
     private String plot;
     private String poster;
+    @Transient
+    private List<Episode> episodes;
 
     public Series(SeriesData seriesData) {
         this.title = seriesData.title();
@@ -24,6 +40,14 @@ public class Series {
         this.actors = seriesData.actors();
         this.plot = seriesData.plot();
         this.poster = seriesData.poster();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {
