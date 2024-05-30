@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.ricardodev.screenmatch.model.SeasonData;
 import com.ricardodev.screenmatch.model.Series;
 import com.ricardodev.screenmatch.model.SeriesData;
+import com.ricardodev.screenmatch.repository.SeriesRepository;
 import com.ricardodev.screenmatch.service.ApiConsuming;
 import com.ricardodev.screenmatch.service.DataConverter;
 
@@ -24,6 +25,11 @@ public class Main {
     private final String BASE_URL = "http://www.omdbapi.com/?apikey=%s".formatted(this.API_KEY);
     private DataConverter converter = new DataConverter();
     private List<SeriesData> seriesHistory = new ArrayList<>();
+    private SeriesRepository seriesRepository;
+
+    public Main(SeriesRepository seriesRepository) {
+        this.seriesRepository = seriesRepository;
+    }
 
     public void showMenu() throws UnsupportedEncodingException {
         int option = -1;
@@ -82,7 +88,9 @@ public class Main {
 
     private void searchSeriesWeb() throws UnsupportedEncodingException {
         SeriesData data = getSeriesData();
-        seriesHistory.add(data);
+        Series series = new Series(data);
+        seriesRepository.save(series);
+        // seriesHistory.add(data);
         System.out.println(data);
     }
 
