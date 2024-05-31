@@ -46,6 +46,7 @@ public class Main {
                     6. Find series by genre
                     7. Filter series by total seasons and rating
                     8. Find episodes by name
+                    9. Find top 5 episodes by series
 
                     0. Exit
                     """;
@@ -84,6 +85,9 @@ public class Main {
                     break;
                 case 8:
                     findEpisodeByName();
+                    break;
+                case 9:
+                    findTop5EpisodesBySeries();
                     break;
                 case 0:
                     System.out.println("Exiting...");
@@ -152,17 +156,17 @@ public class Main {
         ;
     }
 
-    private void findSeriesByTitle() {
+    private Optional<Series> findSeriesByTitle() {
         System.out.print("Type the name of the series which you want to search: ");
         String seriesName = scanner.nextLine();
 
         Optional<Series> result = seriesRepository.findByTitleContainsIgnoreCase(seriesName);
 
-        if (result.isPresent()) {
-            System.out.println("The series is: " + result.get());
-        } else {
-            System.out.println("Series not found.");
-        }
+        result.ifPresentOrElse(
+                (s) -> System.out.println("The series is: " + s.getTitle()),
+                () -> System.out.println("Series not found."));
+
+        return result;
     }
 
     private void findTop5Series() {
@@ -221,6 +225,23 @@ public class Main {
                             e.getSeries().getTitle(), e.getSeasonNumber(), e.getTitle(), e.getRating()));
         } else {
             System.out.println("No series found.");
+        }
+    }
+
+    private void findTop5EpisodesBySeries() {
+        Optional<Series> series = findSeriesByTitle();
+
+        if (series.isPresent()) {
+            Series s = series.get();
+            List<Episode> topEpisodes = seriesRepository.findTop5Episodes(s);
+            if (topEpisodes.size() > 0) {
+                System.out.println("The top 5 episodes are:");
+                topEpisodes.forEach(
+                        e -> System.out.printf("Series: %-5s Season: %-5s Episode: %-30s Rating: %.1f%n",
+                                e.getSeries().getTitle(), e.getSeasonNumber(), e.getTitle(), e.getRating()));
+            } else {
+                System.out.println("No episodes were found");
+            }
         }
     }
 }
