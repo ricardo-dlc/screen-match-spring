@@ -12,12 +12,19 @@ import com.ricardodev.screenmatch.service.SecretsService;
 
 @SpringBootApplication
 @EnableConfigurationProperties(SecretsService.class)
-public class ScreenmatchApplication {
+public class ScreenmatchConsoleApplication implements CommandLineRunner {
 
     @Autowired
+    private SeriesRepository repository;
+    @Autowired
     private SecretsService secretsService;
-
     public static void main(String[] args) {
         SpringApplication.run(ScreenmatchApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        Main main = new Main(repository, secretsService);
+        main.showMenu();
     }
 }
