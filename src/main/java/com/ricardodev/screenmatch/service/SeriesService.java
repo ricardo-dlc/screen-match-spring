@@ -69,4 +69,13 @@ public class SeriesService {
 
         return series.map(s -> toEpisodeDtoList(s.getEpisodes())).orElse(null);
     }
+
+    public List<EpisodeDTO> getSeasonById(Long id, Long seasonId) {
+        Optional<Series> series = repository.findById(id);
+
+        return series
+                .map(s -> toEpisodeDtoList(s.getEpisodes().stream().filter(e -> e.getSeasonNumber() == seasonId)
+                        .collect(Collectors.toList())))
+                .orElse(null);
+    }
 }
