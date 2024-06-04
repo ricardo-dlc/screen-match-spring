@@ -1,6 +1,7 @@
 package com.ricardodev.screenmatch.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,17 +16,21 @@ public class SeriesService {
     @Autowired
     private SeriesRepository repository;
 
+    private SeriesDTO convertToDto(Series series) {
+        return new SeriesDTO(
+                series.getId(),
+                series.getTitle(),
+                series.getTotalSeasons(),
+                series.getRating(),
+                series.getGenre(),
+                series.getActors(),
+                series.getPlot(),
+                series.getPoster());
+    }
+
     private List<SeriesDTO> convertSeriesData(List<Series> series) {
         return series.stream()
-                .map(s -> new SeriesDTO(
-                        s.getId(),
-                        s.getTitle(),
-                        s.getTotalSeasons(),
-                        s.getRating(),
-                        s.getGenre(),
-                        s.getActors(),
-                        s.getPlot(),
-                        s.getPoster()))
+                .map(s -> convertToDto(s))
                 .collect(Collectors.toList());
     }
 
@@ -39,5 +44,11 @@ public class SeriesService {
 
     public List<SeriesDTO> getRecentReleases() {
         return convertSeriesData(repository.findRecentSeries());
+    }
+
+    public SeriesDTO getSeriesById(Long id) {
+        Optional<Series> series = repository.findById(id);
+
+        return series.map(this::convertToDto).orElse(null);
     }
 }
