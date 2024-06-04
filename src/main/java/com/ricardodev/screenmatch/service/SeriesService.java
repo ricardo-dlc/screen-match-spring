@@ -36,4 +36,8 @@ public class SeriesService {
     public List<SeriesDTO> getTop5Series() {
         return convertSeriesData(repository.findTop5ByOrderByRatingDesc());
     }
+
+    public List<SeriesDTO> getRecentReleases() {
+        return convertSeriesData(repository.findRecentSeries());
+    }
 }
