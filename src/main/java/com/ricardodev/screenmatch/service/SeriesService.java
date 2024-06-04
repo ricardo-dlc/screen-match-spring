@@ -89,4 +89,11 @@ public class SeriesService {
             return Collections.emptyList();
         }
     }
+
+    public List<EpisodeDTO> getTop5EpisodesBySeriesId(Long id) {
+        Optional<Series> series = repository.findById(id);
+        return series
+                .map(s -> toEpisodeDtoList(repository.findTop5Episodes(s)))
+                .orElse(Collections.emptyList());
+    }
 }
