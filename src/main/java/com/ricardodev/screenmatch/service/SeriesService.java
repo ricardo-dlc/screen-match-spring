@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ricardodev.screenmatch.dto.EpisodeDTO;
 import com.ricardodev.screenmatch.dto.SeriesDTO;
+import com.ricardodev.screenmatch.model.Episode;
 import com.ricardodev.screenmatch.model.Series;
 import com.ricardodev.screenmatch.repository.SeriesRepository;
 
@@ -16,7 +18,7 @@ public class SeriesService {
     @Autowired
     private SeriesRepository repository;
 
-    private SeriesDTO convertToDto(Series series) {
+    private SeriesDTO toSeriesDto(Series series) {
         return new SeriesDTO(
                 series.getId(),
                 series.getTitle(),
@@ -28,27 +30,43 @@ public class SeriesService {
                 series.getPoster());
     }
 
-    private List<SeriesDTO> convertSeriesData(List<Series> series) {
+    private List<SeriesDTO> toSeriesDtoList(List<Series> series) {
         return series.stream()
-                .map(s -> convertToDto(s))
+                .map(s -> toSeriesDto(s))
                 .collect(Collectors.toList());
     }
 
+    private List<EpisodeDTO> toEpisodeDtoList(List<Episode> episodes) {
+        return episodes.stream()
+                .map(e -> toEpisodeDto(e))
+                .collect(Collectors.toList());
+    }
+
+    private EpisodeDTO toEpisodeDto(Episode e) {
+        return new EpisodeDTO(e.getId(), e.getSeasonNumber(), e.getTitle(), e.getEpisodeNumber());
+    }
+
     public List<SeriesDTO> getAllSeries() {
-        return convertSeriesData(repository.findAll());
+        return toSeriesDtoList(repository.findAll());
     }
 
     public List<SeriesDTO> getTop5Series() {
-        return convertSeriesData(repository.findTop5ByOrderByRatingDesc());
+        return toSeriesDtoList(repository.findTop5ByOrderByRatingDesc());
     }
 
     public List<SeriesDTO> getRecentReleases() {
-        return convertSeriesData(repository.findRecentSeries());
+        return toSeriesDtoList(repository.findRecentSeries());
     }
 
     public SeriesDTO getSeriesById(Long id) {
         Optional<Series> series = repository.findById(id);
 
-        return series.map(this::convertToDto).orElse(null);
+        return series.map(this::toSeriesDto).orElse(null);
+    }
+
+    public List<EpisodeDTO> getAllSeasons(Long id) {
+        Optional<Series> series = repository.findById(id);
+
+        return series.map(s -> toEpisodeDtoList(s.getEpisodes())).orElse(null);
     }
 }
