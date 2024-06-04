@@ -1,5 +1,6 @@
 package com.ricardodev.screenmatch.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.ricardodev.screenmatch.dto.EpisodeDTO;
 import com.ricardodev.screenmatch.dto.SeriesDTO;
 import com.ricardodev.screenmatch.model.Episode;
+import com.ricardodev.screenmatch.model.Genre;
 import com.ricardodev.screenmatch.model.Series;
 import com.ricardodev.screenmatch.repository.SeriesRepository;
 
@@ -67,7 +69,7 @@ public class SeriesService {
     public List<EpisodeDTO> getAllSeasons(Long id) {
         Optional<Series> series = repository.findById(id);
 
-        return series.map(s -> toEpisodeDtoList(s.getEpisodes())).orElse(null);
+        return series.map(s -> toEpisodeDtoList(s.getEpisodes())).orElse(Collections.emptyList());
     }
 
     public List<EpisodeDTO> getSeasonById(Long id, Long seasonId) {
@@ -76,6 +78,15 @@ public class SeriesService {
         return series
                 .map(s -> toEpisodeDtoList(s.getEpisodes().stream().filter(e -> e.getSeasonNumber() == seasonId)
                         .collect(Collectors.toList())))
-                .orElse(null);
+                .orElse(Collections.emptyList());
+    }
+
+    public List<SeriesDTO> getSeriesByGenre(String genre) {
+        try {
+            Genre searchGenre = Genre.fromString(genre);
+            return toSeriesDtoList(repository.findByGenre(searchGenre));
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ricardodev.screenmatch.dto.EpisodeDTO;
 import com.ricardodev.screenmatch.dto.SeriesDTO;
+import com.ricardodev.screenmatch.model.Genre;
 import com.ricardodev.screenmatch.service.SeriesService;
 
 @RestController
@@ -46,5 +47,10 @@ public class SeriesController {
     @GetMapping("/{id}/seasons/{seasonId}")
     public List<EpisodeDTO> getSeasonById(@PathVariable Long id, @PathVariable Long seasonId) {
         return service.getSeasonById(id, seasonId);
+    }
+
+    @GetMapping("/genre/{genre}")
+    public List<SeriesDTO> getSeriesBygenre(@PathVariable String genre) {
+        return service.getSeriesByGenre(genre);
     }
 }
